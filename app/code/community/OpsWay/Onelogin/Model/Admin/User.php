@@ -52,7 +52,7 @@ class OpsWay_Onelogin_Model_Admin_User extends Mage_Admin_Model_User
         $result = false;
 
         try {
-            $this->loadByEmail($username);
+            $this->loadByUsername($username);
 
             if ($this->getId()) {
                 if ($this->getIsActive() != '1') {

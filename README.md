@@ -1,3 +1,32 @@
+NOTE:
+This module has been adapted to better suit normal SAML 2.0 logins.
+It has been tested against FreeIPA and Ipsilon using this metadata file:
+
+<?xml version='1.0' encoding='UTF-8'?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="php-saml">
+  <md:SPSSODescriptor
+      AuthnRequestsSigned="false"
+      protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+    <md:KeyDescriptor>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>cert data here without begin and end
+          </ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+
+    <md:AssertionConsumerService isDefault="true" index="0"
+      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+      Location="http://magento/index.php/admin/index/index/key/03b31913151771f3e1b18c2b230aa110/" />
+
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+  </md:SPSSODescriptor>
+</md:EntityDescriptor>
+
 Magento Admin - Onelogin integration (SAML)
 ===========================================
 

@@ -40,7 +40,7 @@ class OpsWay_Onelogin_Model_Observer
             /* @var $formButtons SimpleXMLElement */
             $formButtons = current($xml->xpath('//form[@id=\'loginForm\']//div[@class=\'form-buttons\']'));
             
-            $oneloginLink = $formButtons->addChild('a', Mage::helper('opsway_onelogin')->__('Login via Onelogin'));
+            $oneloginLink = $formButtons->addChild('a', Mage::helper('opsway_onelogin')->__('Login via SSO'));
             $oneloginLink->addAttribute('class', 'left');
             $oneloginLink->addAttribute('style', 'margin-left: 10px');
 
@@ -49,10 +49,16 @@ class OpsWay_Onelogin_Model_Observer
             $idpData = $SAMLsettings->getIdPData();
             $idpSSO = '';
             if (isset($idpData['singleSignOnService']) && isset($idpData['singleSignOnService']['url'])) {
-                $idpSSO = $idpData['singleSignOnService']['url'];
-                $authnRequest = new OneLogin_Saml2_AuthnRequest($SAMLsettings);
-                $parameters['SAMLRequest'] = $authnRequest->getRequest();
-                $idpSSO = OneLogin_Saml2_Utils::redirect($idpSSO, $parameters, true);
+							  if (Mage::app()->getRequest()->getParam('saml2_login') === '1')
+								{
+									$idpSSO = $idpData['singleSignOnService']['url'];
+									$auth = new Onelogin_Saml2_Auth($SAMLsettings);
+									$signXml = Mage::getStoreConfig('dev/onelogin/sign_xml');
+									$event->getTransport()->setHtml($auth->login(null, $signXml));
+									return;
+								} else {
+									$idpSSO = '?saml2_login=1';
+								}
             }
             
             $oneloginLink->addAttribute('href', $idpSSO);

@@ -42,7 +42,7 @@ class OpsWay_Onelogin_Model_Admin_Session extends Mage_Admin_Model_Session
             try {
                 /* @var $user OpsWay_Onelogin_Model_Admin_User */
                 $user = Mage::getModel('opsway_onelogin/admin_user');
-                $user = $user->loadByEmail($username);
+                $user = $user->loadByUsername($username);
 
                 if (!$user->getId() && Mage::getStoreConfig('dev/onelogin/provisioning')) {
 
@@ -54,7 +54,7 @@ class OpsWay_Onelogin_Model_Admin_Session extends Mage_Admin_Model_Session
 
                     $data = array(
                         'username' => $userData['username'],
-                        'password' => '@@@nopassword@@@',
+                        'password' => '',
                         'email' =>  $userData['email'],
                         'firstname' => $userData['first_name'],
                         'lastname'  => $userData['last_name'],

@@ -57,7 +57,9 @@
     <default>
         <dev>
             <onelogin>
-                    <app_id>357942</app_id>
+										<assertion_url>https://samlserver/saml2/postResponse</assertion_url>
+										<assertion_index>0</assertion_index>
+										<logout_url>https://samlserver/saml2/logout</logout_url>
                     <certificate><![CDATA[-----BEGIN CERTIFICATE-----
 MIIEETCCAvmgAwIBAgIUJEUIqv5G0+cLHzcX1xCJr0ZzI1UwDQYJKoZIhvcNAQEF
 BQAwVjELMAkGA1UEBhMCVVMxDzANBgNVBAoMBk9wc3dheTEVMBMGA1UECwwMT25l

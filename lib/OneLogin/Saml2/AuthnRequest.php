@@ -72,9 +72,6 @@ PROVIDERNAME;
         Format="{$nameIDPolicyFormat}"
         AllowCreate="true">
     </samlp:NameIDPolicy>
-    <samlp:RequestedAuthnContext Comparison="exact">
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
-    </samlp:RequestedAuthnContext>    
 </samlp:AuthnRequest>
 AUTHNREQUEST;
 
@@ -85,10 +82,17 @@ AUTHNREQUEST;
      * Returns deflated, base64 encoded, unsigned AuthnRequest.
      *
      */
-    public function getRequest()
+    public function getRequest($encoded = TRUE, $compressed = FALSE)
     {
-        $deflatedRequest = gzdeflate($this->_authnRequest);
-        $base64Request = base64_encode($deflatedRequest);
-        return $base64Request;
+			  if ($encoded) {
+					  if ($compressed) {
+							  $deflatedRequest = gzdeflate($this->_authnRequest);
+								$base64Request = base64_encode($this->_authnRequest);
+						} else
+							  $base64Request = base64_encode($this->_authnRequest);
+						return $base64Request;
+				} else {
+					return $this->_authnRequest;
+				}
     }
 }

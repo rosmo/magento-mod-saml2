@@ -1,10 +1,9 @@
 <?php
 
-define('ONELOGIN_METADATA_BASE', 'https://app.onelogin.com/saml/metadata/');
-define('ONELOGIN_SSO_BASE', 'https://app.onelogin.com/trust/saml2/http-post/sso/');
-define('ONELOGIN_SLO_BASE', 'https://app.onelogin.com/trust/saml2/http-redirect/slo/');
-
-$appId = Mage::getStoreConfig('dev/onelogin/app_id');
+$metadataUrl =  Mage::getStoreConfig('dev/onelogin/metadata_url');
+$assertionUrl = Mage::getStoreConfig('dev/onelogin/assertion_url');
+$assertionIndex = Mage::getStoreConfig('dev/onelogin/assertion_index');
+$logoutUrl = Mage::getStoreConfig('dev/onelogin/logout_url');
 
 require_once('_toolkit_loader.php');
 
@@ -18,17 +17,19 @@ $settings = array (
         'assertionConsumerService' => array (
             'url' => Mage::helper("adminhtml")->getUrl(),
         ),
-        'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+        'NameIDFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+				'privateKey' => Mage::getStoreConfig('dev/onelogin/sp_private_key'),
+        'x509cert' => Mage::getStoreConfig('dev/onelogin/sp_certificate')
     ),
     'idp' => array (
-        'entityId' => ONELOGIN_METADATA_BASE.$appId,
+        'entityId' => $metadataUrl,
         'singleSignOnService' => array (
-            'url' => ONELOGIN_SSO_BASE.$appId,
+            'url' => $assertionUrl,
         ),
         'singleLogoutService' => array (
-            'url' => ONELOGIN_SLO_BASE.$appId,
+            'url' => $assertionIndex,
         ),
-        'x509cert' => Mage::getStoreConfig('dev/onelogin/certificate'),
+        'x509cert' => Mage::getStoreConfig('dev/onelogin/certificate')
     ),
 
     'security' => array (
@@ -42,3 +43,9 @@ $settings = array (
         'wantAssertionsEncrypted' => false,
     )
 );
+if (($entityId = Mage::getStoreConfig('dev/onelogin/entity_id')) != '') {
+	  $settings['sp']['entityId'] = $entityId;
+}
+if (Mage::getStoreConfig('dev/onelogin/sign_requests')) {
+	  $settings['security']['authnRequestsSigned'] = true;
+}

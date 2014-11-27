@@ -49,7 +49,10 @@ class OneLogin_Saml2_Auth
      */
     public function __construct($oldSettings = null)
     {
-        $this->_settings = new OneLogin_Saml2_Settings($oldSettings);
+			  if ($oldSettings instanceof OneLogin_Saml2_Settings)
+					$this->_settings = $oldSettings;
+				else
+					$this->_settings = new OneLogin_Saml2_Settings($oldSettings);
     }
 
     /**
@@ -243,7 +246,7 @@ class OneLogin_Saml2_Auth
      *
      * @param string $returnTo The target URL the user should be returned to after login.
      */
-    public function login($returnTo = null)
+    public function login($returnTo = null, $signXml = false)
     {
         $authnRequest = new OneLogin_Saml2_AuthnRequest($this->_settings);
 
@@ -258,11 +261,31 @@ class OneLogin_Saml2_Auth
 
         $security = $this->_settings->getSecurityData();
         if (isset($security['authnRequestsSigned']) && $security['authnRequestsSigned']) {
-            $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState']);
-            $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
-            $parameters['Signature'] = $signature;
+					  if ($signXml) {
+							$samlRequest = OneLogin_Saml2_Utils::addSign($authnRequest->getRequest(FALSE),
+																													 $this->_settings->getSPkey(),
+																													 $this->_settings->getSPcert());
+							$parameters['SAMLRequest'] = base64_encode($samlRequest);
+						} else {
+							  $signature = $this->buildRequestSignature($samlRequest, $parameters['RelayState']);
+							  $parameters['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+							  $parameters['Signature'] = $signature;
+						}
         }
-        $this->redirectTo($this->getSSOurl(), $parameters);
+				$html .= '<!doctype html>
+<html>
+<head></head>
+<body onload="document.forms[0].submit();">
+Redirecting to <a href="' . $this->getSSOurl() . '">' . htmlspecialchars($this->getSSOurl()) . '</a>...
+<form method="post" action="' . htmlspecialchars($this->getSSOurl()) . '" style="display: none;">' . "\n";
+				foreach ($parameters as $k => $v)
+					$html .= '<input type="hidden" name="' . htmlspecialchars($k) . '" value="' . htmlspecialchars($v) . '" />';
+				
+				$html .= '<input type="submit" value="Forward" />
+</form>
+</body>
+</html>';
+				return $html;
     }
 
     /**

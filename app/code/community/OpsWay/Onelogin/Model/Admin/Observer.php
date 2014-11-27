@@ -90,18 +90,23 @@ class OpsWay_Onelogin_Model_Admin_Observer extends Mage_Admin_Model_Observer
                             }
                         }
                     }
-                }
+                } else {
+									$userData['role'] = array();
+									$role1 = Mage::getStoreConfig('dev/onelogin/magentorole1');
+									$userData['role'][] = $role1;
+								}
 
-                if (!isset($userData['email']) || empty($userData['email'])) {
-                    $userData['email'] = $samlResponse->getNameId();    
-                }
-
-                if (!isset($userData['username']) || empty($userData['username'])) {
-                    $userData['username'] = $userData['email'];   
-                }
-
+								if (!isset($userData['username'])) {
+								  	$userData['username'] = $samlResponse->getNameId();
+								}
                 if (!isset($userData['first_name']) || empty($userData['first_name'])) {
                     $userData['first_name'] = '.';
+                }
+								if (!isset($userData['email'])) {
+                    $userData['email'] = $userData['username'];
+                }
+								if (!isset($userData['last_name'])) {
+                    $userData['last_name'] = $userData['username'];
                 }
                 
                 return $userData;
